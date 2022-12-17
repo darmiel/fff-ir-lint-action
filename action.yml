@@ -11,6 +11,22 @@ inputs:
   files:
     required: true
     description: '.ir files to check'
+
+  # auto approve pull request of no errors found
+  # (requires GITHUB_TOKEN)
+  auto-approve:
+    description: 'auto approve pull request if no errors found'
+    default: true
+  auto-approve-message:
+    description: 'message for auto approve'
+  
+  # auto request changes if errors found
+  # (requires GITHUB_TOKEN)
+  auto-request-changes:
+    description: 'auto request changes pull request if errors found'
+    default: true
+  auto-request-changes-message:
+    description: 'message for auto request changes'
 runs:
   using: 'node16'
   main: 'dist/index.js'
