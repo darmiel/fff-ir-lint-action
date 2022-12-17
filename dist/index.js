@@ -98,12 +98,12 @@ function run() {
                     comments.push({
                         body: `> **Warn:** ${issue.result.error}${issue.result.suggestion !== undefined &&
                             issue.result.suggestion !== null &&
-                            issue.result.suggestion !== ''
-                            ? '\n```suggestion\n'
+                            issue.result.suggestion !== '' &&
+                            !issue.result.suggestion.endsWith('...')
+                            ? '\n\n```suggestion\n'
                                 .concat(issue.result.suggestion)
                                 .concat('\n```')
-                            : ''}
-        *(note that suggestions may be false)*`,
+                            : ''}\n*(note that suggestions may be false)*`,
                         path: file,
                         line: issue.lnr,
                         side: 'LEFT'
@@ -124,6 +124,7 @@ function run() {
                     body: core.getInput('auto-request-changes-message') ||
                         `🚓 Found **${count} errors** across **${Object.keys(issues).length} files**:`,
                     event: 'REQUEST_CHANGES',
+                    commit_id: github.context.sha,
                     comments
                 });
             }
