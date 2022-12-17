@@ -81,6 +81,7 @@ function run() {
                 }
                 return;
             }
+            let comments = [];
             for (const file of Object.keys(issues)) {
                 for (const issue of issues[file]) {
                     let startColumn = undefined;
@@ -102,6 +103,13 @@ function run() {
                         startColumn,
                         endColumn
                     });
+                    // push to comments for request-changes
+                    comments.push({
+                        body: issue.result.error + (issue.result.suggestion != '' ? ('\n```suggestion\n' + issue.result.suggestion + '\n```') : ''),
+                        path: file,
+                        line: issue.lnr,
+                        side: 'RIGHT'
+                    });
                 }
             }
             if (core.getBooleanInput('auto-request-changes')) {
@@ -116,7 +124,8 @@ function run() {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     body: core.getInput('auto-request-changes-message'),
-                    event: 'REQUEST_CHANGES'
+                    event: 'REQUEST_CHANGES',
+                    comments
                 });
             }
         }

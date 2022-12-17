@@ -20,6 +20,23 @@ interface FatResult {
   result: Result
 }
 
+interface Comment {
+    /** @description The relative path to the file that necessitates a review comment. */
+    path: string;
+    /** @description The position in the diff where you want to add a review comment. Note this value is not the same as the line number in the file. For help finding the position value, read the note below. */
+    position?: number;
+    /** @description Text of the review comment. */
+    body: string;
+    /** @example 28 */
+    line?: number;
+    /** @example RIGHT */
+    side?: string;
+    /** @example 26 */
+    start_line?: number;
+    /** @example LEFT */
+    start_side?: string;
+}
+
 async function run(): Promise<void> {
   try {
     const token = core.getInput('token')
@@ -72,6 +89,8 @@ async function run(): Promise<void> {
       return
     }
 
+    let comments: Comment[] = []
+
     for (const file of Object.keys(issues)) {
       for (const issue of issues[file]) {
         let startColumn: number | undefined = undefined
@@ -95,6 +114,14 @@ async function run(): Promise<void> {
           startColumn,
           endColumn
         })
+
+        // push to comments for request-changes
+        comments.push({
+          body: issue.result.error + (issue.result.suggestion != '' ? ('\n```suggestion\n' + issue.result.suggestion + '\n```') : ''),
+          path: file,
+          line: issue.lnr,
+          side: 'RIGHT'
+        })
       }
     }
 
@@ -112,7 +139,8 @@ async function run(): Promise<void> {
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         body: core.getInput('auto-request-changes-message'),
-        event: 'REQUEST_CHANGES'
+        event: 'REQUEST_CHANGES',
+        comments
       })
     }
   } catch (error) {
