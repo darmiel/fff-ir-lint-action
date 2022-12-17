@@ -81,9 +81,11 @@ function run() {
                 }
                 return;
             }
-            let comments = [];
+            const comments = [];
+            let count = 0;
             for (const file of Object.keys(issues)) {
                 for (const issue of issues[file]) {
+                    count++;
                     let startColumn = undefined;
                     let endColumn = undefined;
                     // get smallest start colunm
@@ -105,7 +107,12 @@ function run() {
                     });
                     // push to comments for request-changes
                     comments.push({
-                        body: issue.result.error + (issue.result.suggestion != '' ? ('\n```suggestion\n' + issue.result.suggestion + '\n```') : ''),
+                        body: `${issue.result.error}${issue.result.suggestion !== undefined &&
+                            issue.result.suggestion !== ''
+                            ? '\n```suggestion\n'
+                                .concat(issue.result.suggestion)
+                                .concat('\n```')
+                            : ''}`,
                         path: file,
                         line: issue.lnr,
                         side: 'RIGHT'
@@ -123,7 +130,8 @@ function run() {
                     pull_number: pullRequest.number,
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
-                    body: core.getInput('auto-request-changes-message'),
+                    body: core.getInput('auto-request-changes-message') ||
+                        `🚓 Found **${count} errors** across **${Object.keys(issues).length} files**:`,
                     event: 'REQUEST_CHANGES',
                     comments
                 });
