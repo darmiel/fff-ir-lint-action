@@ -106,32 +106,21 @@ async function run(): Promise<void> {
           }
         }
 
-        core.error(issue.result.error, {
-          title: 'fff-ir-lint',
-          file,
-          startLine: issue.lnr,
-          endLine: issue.lnr,
-          startColumn,
-          endColumn
-        })
-
         // push to comments for request-changes
-        const body = `${issue.result.error}${
-          issue.result.suggestion !== undefined &&
-          issue.result.suggestion !== null &&
-          issue.result.suggestion !== ''
-            ? '\n```suggestion\n'
-                .concat(issue.result.suggestion)
-                .concat('\n```')
-            : ''
-        }`
-        core.info(body)
-
         comments.push({
-          body,
+          body: `> **Warn:** ${issue.result.error}${
+            issue.result.suggestion !== undefined &&
+            issue.result.suggestion !== null &&
+            issue.result.suggestion !== ''
+              ? '\n```suggestion\n'
+                  .concat(issue.result.suggestion)
+                  .concat('\n```')
+              : ''
+          }
+        *(note that suggestions may be false)*`,
           path: file,
           line: issue.lnr,
-          side: 'RIGHT'
+          side: 'LEFT'
         })
       }
     }
