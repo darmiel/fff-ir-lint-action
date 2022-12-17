@@ -56,12 +56,9 @@ function run() {
                 ignoreReturnCode: true
             };
             yield exec.exec('python', [`${path}/main.py`, 'json', ...filesToCheck], options);
-            core.info(`Output Start`);
             core.info(jsonOutput);
-            core.info('Output End');
             // parse output
             const issues = JSON.parse(jsonOutput);
-            core.info(`Parsed: ${issues}`);
             // if no keys were found, auto approve pull request
             if (Object.keys(issues).length === 0) {
                 if (core.getBooleanInput('auto-approve')) {
@@ -106,13 +103,16 @@ function run() {
                         endColumn
                     });
                     // push to comments for request-changes
+                    const body = `${issue.result.error}${issue.result.suggestion !== undefined &&
+                        issue.result.suggestion !== null &&
+                        issue.result.suggestion !== ''
+                        ? '\n```suggestion\n'
+                            .concat(issue.result.suggestion)
+                            .concat('\n```')
+                        : ''}`;
+                    core.info(body);
                     comments.push({
-                        body: `${issue.result.error}${issue.result.suggestion !== undefined &&
-                            issue.result.suggestion !== ''
-                            ? '\n```suggestion\n'
-                                .concat(issue.result.suggestion)
-                                .concat('\n```')
-                            : ''}`,
+                        body,
                         path: file,
                         line: issue.lnr,
                         side: 'RIGHT'
@@ -136,6 +136,7 @@ function run() {
                     comments
                 });
             }
+            core.setFailed('Found issues');
         }
         catch (error) {
             if (error instanceof Error)
