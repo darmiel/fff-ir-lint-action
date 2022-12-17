@@ -96,7 +96,7 @@ function run() {
                     }
                     // push to comments for request-changes
                     comments.push({
-                        body: `> **Warn:** ${issue.result.error}${issue.result.suggestion !== undefined &&
+                        body: `${issue.result.error}${issue.result.suggestion !== undefined &&
                             issue.result.suggestion !== null &&
                             issue.result.suggestion !== '' &&
                             !issue.result.suggestion.endsWith('...')
@@ -124,7 +124,6 @@ function run() {
                     body: core.getInput('auto-request-changes-message') ||
                         `🚓 Found **${count} errors** across **${Object.keys(issues).length} files**:`,
                     event: 'REQUEST_CHANGES',
-                    commit_id: github.context.sha,
                     comments
                 });
             }

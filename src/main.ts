@@ -108,7 +108,7 @@ async function run(): Promise<void> {
 
         // push to comments for request-changes
         comments.push({
-          body: `> **Warn:** ${issue.result.error}${
+          body: `${issue.result.error}${
             issue.result.suggestion !== undefined &&
             issue.result.suggestion !== null &&
             issue.result.suggestion !== '' &&
@@ -145,7 +145,6 @@ async function run(): Promise<void> {
             Object.keys(issues).length
           } files**:`,
         event: 'REQUEST_CHANGES',
-        commit_id: github.context.sha,
         comments
       })
     }
