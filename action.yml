@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'fff-ir-lint'
+description: 'check .ir files'
+author: 'd2a <hi@d2a.io>'
 inputs:
-  milliseconds: # change this
+  token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'GitHub Repository Token'
+  lint-path:
+    required: true
+    description: 'Path to linter without tailing /'
+  files:
+    required: true
+    description: '.ir files to check'
 runs:
   using: 'node16'
   main: 'dist/index.js'

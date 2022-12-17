@@ -1,16 +1,30 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as exec from '@actions/exec'
+// import * as github from '@actions/github'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    // const token = core.getInput('token')
+    // const octokit = github.getOctokit(token)
+    // execute linting
+    const path = core.getInput('lint-path')
+    const filesToCheck = core.getInput('files').split('\n')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    let jsonOutput = ''
+    const options = {
+      listeners: {
+        stdout: (data: Buffer) => {
+          jsonOutput += data.toString()
+        }
+      }
+    }
+    await exec.exec(
+      'python',
+      [`${path}/main.py`, 'json', ...filesToCheck],
+      options
+    )
+    core.info(`Output:`)
+    core.info(jsonOutput)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
