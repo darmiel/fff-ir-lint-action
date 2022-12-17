@@ -115,7 +115,7 @@ function run() {
                 // get pull request number
                 const pullRequest = github.context.payload.pull_request;
                 if (!pullRequest) {
-                    throw new Error('auto-reject requires the action to be run in a pull_request event');
+                    throw new Error('auto-request-changes requires the action to be run in a pull_request event');
                 }
                 yield octokit.rest.pulls.createReview({
                     pull_number: pullRequest.number,
